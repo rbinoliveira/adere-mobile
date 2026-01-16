@@ -7,6 +7,7 @@ import Toast from 'react-native-toast-message'
 
 import { ScrollViewPadding } from '@/application/design/design-tokens'
 import { useAuth } from '@/application/hooks/auth'
+import { useMedications } from '@/application/hooks/medications'
 import { useNotifications } from '@/application/hooks/notifications'
 import {
   DailyTipCard,
@@ -19,61 +20,20 @@ import {
 import { Medication } from '@/application/types/medication'
 import { updateMedicationStatuses } from '@/application/utils/medication-status'
 
-function getMockMedications(): Medication[] {
-  const now = new Date()
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-
-  return [
-    {
-      id: '1',
-      name: 'Losartana',
-      dose: '50mg',
-      form: 'capsula',
-      scheduledTime: new Date(today.getTime() + 8 * 60 * 60 * 1000), // 08:00
-      instructions: 'Engolir com água, antes do café da manhã',
-      status: 'on_time',
-    },
-    {
-      id: '2',
-      name: 'Metformina',
-      dose: '500mg',
-      form: 'comprimido',
-      scheduledTime: new Date(today.getTime() + 12 * 60 * 60 * 1000), // 12:00
-      instructions: 'Engolir com água, após o almoço',
-      status: 'delayed',
-      delayMinutes: 20,
-    },
-    {
-      id: '3',
-      name: 'Xarope Expectorante',
-      dose: '5ml',
-      form: 'liquido',
-      scheduledTime: new Date(today.getTime() + 22 * 60 * 60 * 1000), // 22:00
-      instructions: 'Medir 5ml na seringa, tomar puro',
-      status: 'very_delayed',
-    },
-    {
-      id: '4',
-      name: 'Pomada Cicatrizante',
-      dose: 'Uso tópico',
-      form: 'pomada',
-      scheduledTime: new Date(today.getTime() + 20 * 60 * 60 * 1000), // 20:00
-      instructions: 'Aplicar pequena quantidade no local, massagear suavemente',
-      status: 'waiting',
-      delayMinutes: 8,
-    },
-  ]
-}
-
 export function HomeScreen() {
   const { user } = useAuth()
   const router = useRouter()
   const { scheduleNotifications } = useNotifications()
+  const { medications: fetchedMedications, loading: _medicationsLoading } =
+    useMedications()
   const [takenMedications, setTakenMedications] = useState<
     Record<string, Date>
   >({})
 
-  const baseMedications = useMemo(() => getMockMedications(), [])
+  const baseMedications = useMemo(
+    () => fetchedMedications || [],
+    [fetchedMedications],
+  )
 
   const medications = useMemo(() => {
     const medsWithTaken = baseMedications.map((med) => ({

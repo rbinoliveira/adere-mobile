@@ -10,12 +10,14 @@ import {
   STEP_NUMBER_SIZE,
 } from '@/application/design/design-tokens'
 import {
+  formatTime,
   getFormLabel,
   getInstructionTitle,
   getMedicationType,
+  getTypeColor,
+  getTypeIcon,
   Medication,
   MedicationStatus,
-  MedicationType,
 } from '@/application/types/medication'
 import { triggerLightFeedback } from '@/application/utils/haptic-feedback'
 import { generateStepByStepInstructions } from '@/application/utils/step-by-step-instructions'
@@ -23,34 +25,6 @@ import { generateStepByStepInstructions } from '@/application/utils/step-by-step
 type MedicationCardProps = {
   medication: Medication
   onAction?: (medication: Medication) => void
-}
-
-function formatTime(date: Date): string {
-  return date.toLocaleTimeString('pt-BR', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  })
-}
-
-function getTypeColor(type: MedicationType): string {
-  const colors: Record<MedicationType, string> = {
-    pill: 'bg-green-500',
-    liquid: 'bg-red-500',
-    topical: 'bg-blue-500',
-    other: 'bg-gray-500',
-  }
-  return colors[type]
-}
-
-function getTypeIcon(type: MedicationType): keyof typeof FontAwesome.glyphMap {
-  const icons: Record<MedicationType, keyof typeof FontAwesome.glyphMap> = {
-    pill: 'circle',
-    liquid: 'tint',
-    topical: 'hand-paper-o',
-    other: 'medkit',
-  }
-  return icons[type]
 }
 
 function getStatusConfig(status: MedicationStatus, delayMinutes?: number) {

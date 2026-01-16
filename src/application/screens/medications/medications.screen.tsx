@@ -8,6 +8,7 @@ import { ScrollViewPadding } from '@/application/design/design-tokens'
 import {
   getFormLabel,
   getMedicationType,
+  getTypeIcon,
   Medication,
   MedicationType,
 } from '@/application/types/medication'
@@ -75,24 +76,11 @@ function getMockAllMedications(): Medication[] {
   ]
 }
 
-function getTypeColor(type: MedicationType): string {
-  const colors: Record<MedicationType, string> = {
-    pill: '#22C55E',
-    liquid: '#EF4444',
-    topical: '#3B82F6',
-    other: '#6B7280',
-  }
-  return colors[type]
-}
-
-function getTypeIcon(type: MedicationType): keyof typeof FontAwesome.glyphMap {
-  const icons: Record<MedicationType, string> = {
-    pill: 'circle',
-    liquid: 'tint',
-    topical: 'hand-paper-o',
-    other: 'medkit',
-  }
-  return icons[type]
+const TYPE_HEX_COLORS: Record<MedicationType, string> = {
+  pill: '#22C55E',
+  liquid: '#EF4444',
+  topical: '#3B82F6',
+  other: '#6B7280',
 }
 
 type MedicationListItemProps = {
@@ -101,7 +89,6 @@ type MedicationListItemProps = {
 
 function MedicationListItem({ medication }: MedicationListItemProps) {
   const type = getMedicationType(medication.form)
-  const typeColor = getTypeColor(type)
   const typeIcon = getTypeIcon(type)
   const formLabel = getFormLabel(medication.form)
 
@@ -110,7 +97,7 @@ function MedicationListItem({ medication }: MedicationListItemProps) {
       <View className="flex-row items-center gap-3">
         <View
           className="w-12 h-12 rounded-full items-center justify-center"
-          style={{ backgroundColor: typeColor }}
+          style={{ backgroundColor: TYPE_HEX_COLORS[type] }}
         >
           <FontAwesome name={typeIcon} size={20} color="white" />
         </View>

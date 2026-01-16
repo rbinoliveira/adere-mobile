@@ -101,12 +101,15 @@ export function getTypeColor(type: MedicationType): string {
   return colors[type]
 }
 
-export function getTypeIcon(type: MedicationType): string {
-  const icons: Record<MedicationType, string> = {
-    pill: 'circle',
-    liquid: 'tint',
-    topical: 'hand-paper-o',
-    other: 'medkit',
-  }
-  return icons[type]
+const TYPE_ICONS = {
+  pill: 'circle',
+  liquid: 'tint',
+  topical: 'hand-paper-o',
+  other: 'medkit',
+} as const
+
+export function getTypeIcon(
+  type: MedicationType,
+): (typeof TYPE_ICONS)[MedicationType] {
+  return TYPE_ICONS[type]
 }

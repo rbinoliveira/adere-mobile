@@ -115,38 +115,6 @@ export function convertPrescriptionToMedications(
   return medications
 }
 
-export function calculateMedicationStatus(
-  scheduledTime: Date,
-): Medication['status'] {
-  const now = new Date()
-  const diffMinutes = Math.floor(
-    (now.getTime() - scheduledTime.getTime()) / (60 * 1000),
-  )
-
-  if (diffMinutes < -15) {
-    return 'waiting'
-  }
-  if (diffMinutes <= 15) {
-    return 'on_time'
-  }
-  if (diffMinutes <= 120) {
-    return 'delayed'
-  }
-  return 'very_delayed'
-}
-
-export function calculateDelayMinutes(scheduledTime: Date): number | undefined {
-  const now = new Date()
-  const diffMinutes = Math.floor(
-    (now.getTime() - scheduledTime.getTime()) / (60 * 1000),
-  )
-
-  if (diffMinutes > 0) {
-    return diffMinutes
-  }
-  return undefined
-}
-
 export async function markMedicationAsTaken(
   patientId: string,
   medicationId: string,
