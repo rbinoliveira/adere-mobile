@@ -1,4 +1,4 @@
-import { RecoverPasswordScreen } from '@/application/screens/recover-password/recover-password'
+import { RecoverPasswordScreen } from '@/features/auth/screens/recover-password.screen'
 
 export default function RecoverPassword() {
   return <RecoverPasswordScreen />

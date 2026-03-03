@@ -1,4 +1,4 @@
-import { LoginScreen } from '@/application/screens/login/login.screen'
+import { LoginScreen } from '@/features/auth/screens/login.screen'
 
 export default function Login() {
   return <LoginScreen />

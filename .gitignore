@@ -45,3 +45,11 @@ GoogleService-Info.plist
 google-services.json
 
 .env
+
+
+.claude/
+.gemini/
+.cursor/
+.task-flow/
+CLAUDE.md
+GEMINI.md

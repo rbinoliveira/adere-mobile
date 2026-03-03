@@ -4,14 +4,44 @@
     "appVersionSource": "remote"
   },
   "build": {
+    "development": {
+      "android": {
+        "distribution": "internal",
+        "buildType": "apk"
+      },
+      "ios": {
+        "distribution": "internal",
+        "resourceClass": "m-medium"
+      },
+      "env": {
+        "ANDROID_HOME": "/Users/rubinho/Library/Android/sdk"
+      }
+    },
     "preview": {
       "android": {
         "distribution": "internal",
         "buildType": "apk"
+      },
+      "ios": {
+        "distribution": "internal",
+        "simulator": true
+      },
+      "env": {
+        "ANDROID_HOME": "/Users/rubinho/Library/Android/sdk"
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
+      },
+      "ios": {
+        "distribution": "store"
+      },
+      "env": {
+        "ANDROID_HOME": "/Users/rubinho/Library/Android/sdk"
+      }
     }
   }
 }
