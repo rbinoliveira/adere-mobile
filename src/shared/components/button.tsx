@@ -1,54 +1,91 @@
-import { Pressable, PressableProps, Text } from 'react-native'
+import { ReactNode } from 'react'
+import {
+  ActivityIndicator,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  View,
+} from 'react-native'
 
-import { cn } from '@/shared/utils/cn'
+import { PlatformText } from '@/features/platform/components/platform-text'
+import { BaseColors } from '@/shared/constants/theme.constant'
+import { cn } from '@/shared/libs/tw-merge'
 
-type ButtonProps = PressableProps & {
-  variant?: 'google' | 'apple' | 'login' | 'ghost'
-  label?: string
-  icon?: React.ReactNode
-  className?: string
-  labelClassName?: string
+type ButtonProps = TouchableOpacityProps & {
+  variant?: 'primary' | 'outline' | 'unstyled'
+  children: ReactNode
+  isLoading?: boolean
 }
 
 export function Button({
-  variant = 'login',
-  label,
-  icon,
+  variant = 'primary',
+  children,
+  isLoading,
   className,
-  labelClassName,
+  disabled,
   ...props
 }: ButtonProps) {
-  const variants = {
-    login: [
-      'bg-primary h-[52px] justify-center items-center gap-2 flex-row',
-      'rounded-lg',
-    ],
-    google: [
-      'bg-white border-2 border-border h-[52px] justify-center items-center ',
-      'gap-2 flex-row w-full rounded-lg',
-    ],
-    apple: [
-      'bg-black h-[52px] justify-center items-center ',
-      'gap-2 flex-row w-full rounded-lg',
-    ],
-    ghost: [''],
+  if (variant === 'unstyled') {
+    return (
+      <TouchableOpacity
+        disabled={disabled}
+        className={cn(className)}
+        {...props}
+      >
+        {children}
+      </TouchableOpacity>
+    )
   }
 
-  const textVariants = {
-    login: ['text-white font-inter-semibold'],
-    google: ['text-text-six font-inter-semibold text-sm'],
-    apple: ['text-white font-inter-semibold text-sm'],
-    ghost: [''],
+  if (variant === 'outline') {
+    return (
+      <TouchableOpacity
+        className={cn(
+          'items-center justify-center h-14 rounded-[0.8125rem] border border-neutral-300',
+          (isLoading || disabled) && 'opacity-60',
+          className,
+        )}
+        disabled={isLoading || disabled}
+        {...props}
+      >
+        {isLoading ? (
+          <View className="items-center flex-row gap-2">
+            <ActivityIndicator size="small" color={BaseColors.black} />
+          </View>
+        ) : typeof children === 'string' ? (
+          <PlatformText fontSize={17} color="base-black">
+            {children}
+          </PlatformText>
+        ) : (
+          children
+        )}
+      </TouchableOpacity>
+    )
   }
 
   return (
-    <Pressable {...props} className={cn(className, ...variants[variant])}>
-      {icon}
-      {label && (
-        <Text className={cn(labelClassName, ...textVariants[variant])}>
-          {label}
-        </Text>
+    <TouchableOpacity
+      className={cn(
+        'items-center justify-center h-14 bg-accent-600 rounded-[0.8125rem]',
+        (isLoading || disabled) && 'opacity-60',
+        className,
       )}
-    </Pressable>
+      disabled={isLoading || disabled}
+      {...props}
+    >
+      {isLoading ? (
+        <View className="items-center flex-row gap-2">
+          <ActivityIndicator size="small" color={BaseColors.white} />
+          <PlatformText fontSize={17} color="base-white">
+            Aguarde...
+          </PlatformText>
+        </View>
+      ) : typeof children === 'string' ? (
+        <PlatformText fontSize={17} color="base-white">
+          {children}
+        </PlatformText>
+      ) : (
+        children
+      )}
+    </TouchableOpacity>
   )
 }

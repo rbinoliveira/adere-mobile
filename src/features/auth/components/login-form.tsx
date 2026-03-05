@@ -1,110 +1,158 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Image } from 'expo-image'
+import * as AppleAuthentication from 'expo-apple-authentication'
 import { useRouter } from 'expo-router'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { StyleSheet, TextInput, View } from 'react-native'
-import Toast from 'react-native-toast-message'
+import { Alert, Platform, StyleSheet, TextInput, View } from 'react-native'
 
 import { useAuth } from '@/features/auth/hooks/auth.hook'
-import {
-  LoginFormSchema,
-  loginFormSchema,
-} from '@/features/auth/schemas/login-form.schema'
-import loginIcon from '@/shared/assets/icons/login.svg'
+import { LoginSchema, loginSchema } from '@/features/auth/schemas/login.schema'
+import { PlatformText } from '@/features/platform/components/platform-text'
 import { Button } from '@/shared/components/button'
-import { InputText } from '@/shared/components/text-input'
-
-const styles = StyleSheet.create({
-  icon: { height: 16, width: 16 },
-})
+import { Icon } from '@/shared/components/icons/icon'
+import { Input } from '@/shared/components/input'
+import { BaseColors } from '@/shared/constants/theme.constant'
 
 export function LoginForm() {
-  const { control, handleSubmit } = useForm({
-    resolver: zodResolver(loginFormSchema),
+  const router = useRouter()
+  const { signIn, signInWithGoogle, signInWithApple } = useAuth()
+  const [loading, setLoading] = useState(false)
+  const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | null>(
+    null,
+  )
+  const passwordRef = useRef<TextInput>(null)
+
+  const { control, handleSubmit } = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
   })
 
-  const router = useRouter()
-  const { login } = useAuth()
-  const [isLoading, setIsLoading] = useState(false)
-
-  const passwordRef = useRef<TextInput | null>(null)
-
-  async function onSubmit({ email, password }: LoginFormSchema) {
-    setIsLoading(true)
+  async function onSubmit(data: LoginSchema) {
     try {
-      await login(email, password)
-    } catch (error: unknown) {
-      let message = 'Ocorreu um erro ao fazer login. Tente novamente.'
-
-      if (error?.code === 'auth/invalid-credential') {
-        message = 'E-mail ou senha incorretos.'
-      } else if (error?.code === 'auth/user-not-found') {
-        message = 'Usuário não encontrado.'
-      } else if (error?.code === 'auth/wrong-password') {
-        message = 'Senha incorreta.'
-      } else if (error?.code === 'auth/too-many-requests') {
-        message = 'Muitas tentativas. Tente novamente mais tarde.'
-      } else if (error?.code === 'auth/user-disabled') {
-        message = 'Esta conta foi desativada.'
-      }
-
-      Toast.show({
-        type: 'error',
-        text1: 'Erro no login',
-        text2: message,
-      })
+      setLoading(true)
+      await signIn(data.email, data.password)
+      router.replace('/(private)/home')
+    } catch {
+      Alert.alert(
+        'Erro ao entrar',
+        'Email ou senha incorretos. Tente novamente.',
+      )
     } finally {
-      setIsLoading(false)
+      setLoading(false)
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    try {
+      setSocialLoading('google')
+      await signInWithGoogle()
+      router.replace('/(private)/home')
+    } catch {
+      Alert.alert(
+        'Erro',
+        'Não foi possível entrar com Google. Tente novamente.',
+      )
+    } finally {
+      setSocialLoading(null)
+    }
+  }
+
+  async function handleAppleSignIn() {
+    try {
+      setSocialLoading('apple')
+      await signInWithApple()
+      router.replace('/(private)/home')
+    } catch (error) {
+      console.error('[Apple SignIn Error]', error)
+      Alert.alert('Erro', 'Não foi possível entrar com Apple. Tente novamente.')
+    } finally {
+      setSocialLoading(null)
     }
   }
 
   return (
-    <View className="w-full">
-      <InputText
-        control={control}
-        name="email"
-        placeholder="seuemail@exemplo.com"
-        keyboardType="email-address"
-        returnKeyType="next"
-        onSubmitEditing={() => passwordRef.current?.focus()}
-        label="E-mail"
-        labelDescription="Seu endereço de email"
-        labelIcon={<FontAwesome name={'envelope'} size={14} color={'white'} />}
-        className="mb-4"
-        editable={!isLoading}
-      />
-      <InputText
-        ref={passwordRef}
-        control={control}
-        name="password"
-        placeholder="Digite sua senha"
-        secureTextEntry
-        onSubmitEditing={handleSubmit(onSubmit)}
-        label="Senha"
-        labelDescription="Digite sua senha"
-        labelIcon={<FontAwesome name={'lock'} size={14} color={'white'} />}
-        className="mb-[0.625rem]"
-        editable={!isLoading}
-      />
+    <>
+      {/* Email e senha — campos grandes para facilitar leitura */}
+      <View className="gap-4">
+        <Input
+          name="email"
+          control={control}
+          icon={<Icon iconName="envelope" size={24} color={BaseColors.white} />}
+          placeholder="Seu endereço de email"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          returnKeyType="next"
+          onSubmitEditing={() => passwordRef.current?.focus()}
+          errorClassName="text-accent-600"
+          testID="email-input"
+        />
+        <Input
+          name="password"
+          control={control}
+          icon={<Icon iconName="lock" size={24} color={BaseColors.white} />}
+          placeholder="Digite sua senha"
+          secureTextEntry
+          returnKeyType="go"
+          onSubmitEditing={handleSubmit(onSubmit)}
+          errorClassName="text-accent-600"
+          testID="password-input"
+        />
+      </View>
+
       <Button
-        onPress={() => router.push('/recover-password')}
-        className="self-end mb-[1.125rem]"
-        label="Esqueceu a senha?"
-        variant="ghost"
-        labelClassName="text-primary text-xs font-inter-medium"
-        disabled={isLoading}
-      />
+        variant="unstyled"
+        className="self-start mt-3 mb-6"
+        onPress={() => router.push('/(public)/(auth)/recover-password')}
+      >
+        <PlatformText fontSize={15} color="base-white" className="underline">
+          Esqueceu a senha?
+        </PlatformText>
+      </Button>
+
+      {/* Botão principal — grande e com texto claro */}
       <Button
         onPress={handleSubmit(onSubmit)}
-        label={isLoading ? 'Entrando...' : 'Entrar'}
-        variant="login"
-        icon={
-          !isLoading && <Image source={loginIcon} alt="" style={styles.icon} />
-        }
-        disabled={isLoading}
-      />
-    </View>
+        isLoading={loading}
+        testID="login-button"
+      >
+        Entrar
+      </Button>
+
+      {/* Divisor */}
+      <View className="flex-row items-center my-5 gap-3">
+        <View className="flex-1 h-[1px] bg-white/30" />
+        <PlatformText fontSize={14} color="base-white">
+          ou continue com
+        </PlatformText>
+        <View className="flex-1 h-[1px] bg-white/30" />
+      </View>
+
+      {/* Google */}
+      <Button
+        variant="outline"
+        className="mb-3 border-white/50 bg-white/10 flex-row items-center justify-center gap-3"
+        onPress={handleGoogleSignIn}
+        isLoading={socialLoading === 'google'}
+      >
+        <PlatformText fontSize={16} color="base-white" fontWeight={500}>
+          Continuar com Google
+        </PlatformText>
+      </Button>
+
+      {/* Apple — só no iOS */}
+      {Platform.OS === 'ios' && (
+        <AppleAuthentication.AppleAuthenticationButton
+          buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+          buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE}
+          cornerRadius={13}
+          style={styles.appleButton}
+          onPress={handleAppleSignIn}
+        />
+      )}
+    </>
   )
 }
+
+const styles = StyleSheet.create({
+  appleButton: { height: 56, width: '100%' },
+})

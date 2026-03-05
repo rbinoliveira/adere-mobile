@@ -1,78 +1,60 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome'
-import { LinearGradient } from 'expo-linear-gradient'
-import React from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
-import {
-  CardSpacing,
-  IconSizes,
-  Spacing,
-} from '@/shared/constants/design-tokens'
-
-type DailyTipCardProps = {
-  onViewMorePress?: () => void
-}
+import { PlatformText } from '@/features/platform/components/platform-text'
+import { PurpleColors } from '@/shared/constants/theme.constant'
 
 const DAILY_TIPS = [
-  'Se esquecer de tomar um remédio, tome assim que lembrar. Mas se já estiver próximo do próximo horário, pule a dose esquecida e continue normalmente.',
-  'Tome seus remédios sempre no mesmo horário para criar um hábito e não esquecer.',
-  'Guarde seus medicamentos em local fresco e seco, longe da luz solar direta.',
-  'Nunca pare de tomar um medicamento sem orientação médica, mesmo se estiver se sentindo melhor.',
-  'Beba bastante água ao tomar medicamentos para ajudar na absorção.',
+  'Enquanto estiver tomando antibiótico, não beba bebidas alcoólicas.',
+  'Tome seu remédio sempre no mesmo horário para manter o efeito.',
+  'Nunca pare o antibiótico antes do prazo, mesmo se sentir melhora.',
+  'Beba bastante água ao longo do dia para ajudar o remédio a agir.',
+  'Se esquecer uma dose, tome assim que lembrar — mas nunca dobre a dose.',
 ]
 
 function getTodayTip(): string {
-  const today = new Date()
   const dayOfYear = Math.floor(
-    (today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) /
-      (1000 * 60 * 60 * 24),
+    (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) /
+      86400000,
   )
-  return DAILY_TIPS[dayOfYear % DAILY_TIPS.length]
+  return DAILY_TIPS[dayOfYear % DAILY_TIPS.length] ?? DAILY_TIPS[0]!
 }
 
-export function DailyTipCard({ onViewMorePress }: DailyTipCardProps) {
+type DailyTipCardProps = {
+  onSeeMore?: () => void
+}
+
+export function DailyTipCard({ onSeeMore }: DailyTipCardProps) {
   const tip = getTodayTip()
 
   return (
-    <View className="w-full" style={{ marginTop: Spacing.lg }}>
-      <LinearGradient
-        colors={['#3B82F6', '#2563EB']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        className="w-full rounded-2xl"
-        style={{ padding: CardSpacing.padding }}
+    <View className="rounded-2xl p-4" style={styles.card}>
+      <View className="flex-row items-center gap-2 mb-2">
+        <PlatformText fontSize={18}>💡</PlatformText>
+        <PlatformText fontSize={15} fontWeight={700} color="base-white">
+          Dica do Dia
+        </PlatformText>
+      </View>
+
+      <PlatformText
+        fontSize={14}
+        color="base-white"
+        className="opacity-90 mb-3"
       >
-        <View
-          className="flex-row items-center"
-          style={{ gap: Spacing.sm, marginBottom: Spacing.sm }}
-        >
-          <FontAwesome
-            name="lightbulb-o"
-            size={IconSizes.large}
-            color="#FCD34D"
-          />
-          <Text className="text-white font-inter-bold text-lg">
-            Dica do Dia
-          </Text>
-        </View>
+        {tip}
+      </PlatformText>
 
-        <Text
-          className="text-white font-inter text-base leading-6"
-          style={{ marginBottom: Spacing.md }}
-        >
-          {tip}
-        </Text>
-
-        <Pressable
-          onPress={onViewMorePress}
-          className="bg-white/20 rounded-lg self-start"
-          style={{ paddingVertical: Spacing.sm, paddingHorizontal: Spacing.md }}
-        >
-          <Text className="text-white font-inter-semibold text-base">
-            Ver Mais Dicas
-          </Text>
-        </Pressable>
-      </LinearGradient>
+      <TouchableOpacity
+        className="self-start bg-white/20 rounded-full px-4 py-1.5"
+        onPress={onSeeMore}
+      >
+        <PlatformText fontSize={13} fontWeight={600} color="base-white">
+          Ver Mais Dicas
+        </PlatformText>
+      </TouchableOpacity>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  card: { backgroundColor: PurpleColors[950] },
+})

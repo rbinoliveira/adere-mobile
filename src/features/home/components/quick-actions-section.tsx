@@ -1,110 +1,64 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome'
-import React, { useState } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 
-import {
-  CardSpacing,
-  IconSizes,
-  Spacing,
-} from '@/shared/constants/design-tokens'
-import { triggerLightFeedback } from '@/shared/utils/haptic-feedback'
+import { PlatformText } from '@/features/platform/components/platform-text'
+import { Icon } from '@/shared/components/icons/icon'
+import { AccentColors } from '@/shared/constants/theme.constant'
+
+type QuickAction = {
+  icon: React.ReactNode
+  label: string
+  sublabel: string
+  onPress: () => void
+}
 
 type QuickActionsSectionProps = {
-  onHistoryPress?: () => void
-  onHelpPress?: () => void
-}
-
-type QuickActionCardProps = {
-  icon: keyof typeof FontAwesome.glyphMap
-  iconColor: string
-  title: string
-  subtitle: string
-  onPress?: () => void
-}
-
-const QUICK_ACTION_CARD_MIN_HEIGHT = { minHeight: 120 } as const
-const QUICK_ACTION_ICON_SIZE = { width: 56, height: 56 } as const
-
-function QuickActionCard({
-  icon,
-  iconColor,
-  title,
-  subtitle,
-  onPress,
-}: QuickActionCardProps) {
-  const [isPressed, setIsPressed] = useState(false)
-
-  const handlePress = async () => {
-    await triggerLightFeedback()
-    onPress?.()
-  }
-
-  const handlePressIn = () => {
-    setIsPressed(true)
-    triggerLightFeedback()
-  }
-
-  const handlePressOut = () => {
-    setIsPressed(false)
-  }
-
-  return (
-    <Pressable
-      onPress={handlePress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      className={`flex-1 bg-white rounded-2xl items-center justify-center border border-gray-100 ${
-        isPressed ? 'opacity-80' : 'opacity-100'
-      }`}
-      style={{
-        padding: CardSpacing.padding,
-        ...QUICK_ACTION_CARD_MIN_HEIGHT,
-        ...CardSpacing.shadow,
-      }}
-    >
-      <View
-        className="rounded-full items-center justify-center"
-        style={{
-          ...QUICK_ACTION_ICON_SIZE,
-          backgroundColor: `${iconColor}15`,
-          marginBottom: Spacing.sm,
-        }}
-      >
-        <FontAwesome name={icon} size={IconSizes.large} color={iconColor} />
-      </View>
-      <Text className="text-text-one font-inter-bold text-base text-center">
-        {title}
-      </Text>
-      <Text className="text-text-three font-inter text-sm text-center mt-1">
-        {subtitle}
-      </Text>
-    </Pressable>
-  )
+  onHistoryPress: () => void
+  onHelpPress: () => void
 }
 
 export function QuickActionsSection({
   onHistoryPress,
   onHelpPress,
 }: QuickActionsSectionProps) {
+  const actions: QuickAction[] = [
+    {
+      icon: <Icon iconName="calendar" size={28} color={AccentColors[500]} />,
+      label: 'Histórico',
+      sublabel: 'Ver remédios tomados',
+      onPress: onHistoryPress,
+    },
+    {
+      icon: <Icon iconName="phone" size={28} color={AccentColors[500]} />,
+      label: 'Ajuda',
+      sublabel: 'Como usar o app',
+      onPress: onHelpPress,
+    },
+  ]
+
   return (
-    <View
-      className="w-full flex-row"
-      style={{ marginTop: Spacing.lg, gap: Spacing.md }}
-    >
-      <QuickActionCard
-        icon="file-text-o"
-        iconColor="#3B82F6"
-        title="Histórico"
-        subtitle="Ver remédios tomados"
-        onPress={onHistoryPress}
-      />
-      <QuickActionCard
-        icon="question-circle"
-        iconColor="#10B981"
-        title="Ajuda"
-        subtitle="Como usar o app"
-        onPress={onHelpPress}
-      />
+    <View className="flex-row gap-3">
+      {actions.map((action) => (
+        <TouchableOpacity
+          key={action.label}
+          className="flex-1 bg-base-white rounded-2xl p-4 items-center gap-2"
+          onPress={action.onPress}
+          activeOpacity={0.7}
+        >
+          <View className="w-14 h-14 rounded-full bg-accent-500/10 items-center justify-center">
+            {action.icon}
+          </View>
+          <PlatformText fontSize={15} fontWeight={700} color="neutral-900">
+            {action.label}
+          </PlatformText>
+          <PlatformText
+            fontSize={12}
+            color="neutral-600"
+            className="text-center"
+          >
+            {action.sublabel}
+          </PlatformText>
+        </TouchableOpacity>
+      ))}
     </View>
   )
 }

@@ -1,212 +1,175 @@
+/**
+* Theme constants for Adere Mobile
+* Colors migrated from adere-web/src/shared/styles/globals.css
+ *
+ * IMPORTANT: These colors must be synchronized with tailwind.config.js
+ * Any changes to colors here should be reflected in tailwind.config.js
+ */
+
 import { Platform } from 'react-native'
 
+/**
+ * Base colors
+ */
 export const BaseColors = {
   black: '#000000',
   white: '#FFFFFF',
-  transparent: 'transparent',
-} as const
+}
 
+/**
+ * Neutral colors (grayscale)
+ */
 export const NeutralColors = {
-  50: '#F9FAFB',
-  100: '#F3F4F6',
-  200: '#E5E7EB',
-  300: '#D1D5DB',
-  400: '#9CA3AF',
-  500: '#6B7280',
-  600: '#4B5563',
-  700: '#374151',
-  800: '#1F2937',
-  900: '#111827',
-  950: '#030712',
-} as const
+  100: '#E0E0E0',
+  200: '#EFF2F4',
+  300: '#E5E9EC',
+  350: '#EBEBEB',
+  400: '#F2F4F5',
+  450: '#D9D9D9',
+  500: '#AEAEB2',
+  600: '#979C9E',
+  700: '#72777A',
+  800: '#494949',
+  850: '#3C3C43',
+  900: '#1C1C1C',
+  950: '#1C1C1C',
+}
 
-export const PrimaryColors = {
-  50: '#EFF6FF',
-  100: '#DBEAFE',
-  200: '#BFDBFE',
-  300: '#93C5FD',
-  400: '#60A5FA',
-  500: '#3B82F6',
-  600: '#2563EB',
-  700: '#1D4ED8',
-  800: '#1E40AF',
-  900: '#1E3A8A',
-  950: '#172554',
-} as const
+/**
+ * Accent colors (brand red)
+ */
+export const AccentColors = {
+  500: '#C3161C',
+  600: '#FF453A',
+  950: '#FA0000',
+}
 
+/**
+ * Red colors (same as accent)
+ */
+export const RedColors = {
+  500: '#C3161C',
+  600: '#FF453A',
+  950: '#FA0000',
+}
+
+/**
+ * Success/Green colors
+ */
 export const SuccessColors = {
-  50: '#ECFDF5',
-  100: '#D1FAE5',
-  200: '#A7F3D0',
-  300: '#6EE7B7',
-  400: '#34D399',
-  500: '#10B981',
-  600: '#059669',
-  700: '#047857',
-  800: '#065F46',
-  900: '#064E3B',
-} as const
+  500: '#50E51C',
+  600: '#35CE00',
+  700: '#26A324',
+  950: '#0EAC4F',
+}
 
+export const GreenColors = SuccessColors
+
+/**
+ * Warning/Yellow colors
+ */
 export const WarningColors = {
-  50: '#FFFBEB',
-  100: '#FEF3C7',
-  200: '#FDE68A',
-  300: '#FCD34D',
-  400: '#FBBF24',
-  500: '#F59E0B',
-  600: '#D97706',
-  700: '#B45309',
-  800: '#92400E',
-  900: '#78350F',
-} as const
+  400: '#FCD922',
+  500: '#F8D310',
+  950: '#F4C138',
+}
 
-export const DangerColors = {
-  50: '#FEF2F2',
-  100: '#FEE2E2',
-  200: '#FECACA',
-  300: '#FCA5A5',
-  400: '#F87171',
-  500: '#EF4444',
-  600: '#DC2626',
-  700: '#B91C1C',
-  800: '#991B1B',
-  900: '#7F1D1D',
-} as const
+export const YellowColors = WarningColors
 
+/**
+ * Info/Blue colors
+ */
+export const InfoColors = {
+  950: '#0059DA',
+}
+
+export const BlueColors = InfoColors
+
+/**
+ * Other brand colors
+ */
+export const OrangeColors = {
+  950: '#FF8800',
+}
+
+export const PinkColors = {
+  950: '#FF0091',
+}
+
+export const PurpleColors = {
+  950: '#9933CE',
+}
+
+export const BrownColors = {
+  950: '#904500',
+}
+
+/**
+ * Unified color palette for easy access
+ */
 export const Colors = {
-  ...BaseColors,
+  // Base
+  black: BaseColors.black,
+  white: BaseColors.white,
+
+  // Neutral
   neutral: NeutralColors,
-  primary: PrimaryColors,
+
+  // Brand/Accent
+  accent: AccentColors,
+  red: RedColors,
+
+  // Status
   success: SuccessColors,
   warning: WarningColors,
-  danger: DangerColors,
-} as const
+  info: InfoColors,
 
-export const StatusColors = {
-  success: {
-    background: SuccessColors[100],
-    text: SuccessColors[800],
-    border: SuccessColors[500],
-    button: SuccessColors[500],
-    buttonText: BaseColors.white,
-  },
-  warning: {
-    background: WarningColors[100],
-    text: WarningColors[800],
-    border: WarningColors[500],
-    button: WarningColors[500],
-    buttonText: BaseColors.white,
-  },
-  danger: {
-    background: DangerColors[100],
-    text: DangerColors[800],
-    border: DangerColors[500],
-    button: DangerColors[500],
-    buttonText: BaseColors.white,
-  },
-  waiting: {
-    background: NeutralColors[100],
-    text: NeutralColors[700],
-    border: NeutralColors[400],
-    button: NeutralColors[400],
-    buttonText: BaseColors.white,
-  },
-  info: {
-    background: PrimaryColors[100],
-    text: PrimaryColors[800],
-    border: PrimaryColors[500],
-    button: PrimaryColors[500],
-    buttonText: BaseColors.white,
-  },
-} as const
+  // Other
+  green: GreenColors,
+  yellow: YellowColors,
+  blue: BlueColors,
+  orange: OrangeColors,
+  pink: PinkColors,
+  purple: PurpleColors,
+  brown: BrownColors,
 
-export const TextContrast = {
-  high: {
-    primary: NeutralColors[800],
-    secondary: NeutralColors[600],
-    tertiary: NeutralColors[500],
+  // Light/Dark mode support (currently same for both modes)
+  light: {
+    text: NeutralColors[900],
+    background: NeutralColors[300],
+    tint: AccentColors[500],
+    icon: NeutralColors[700],
+    tabIconDefault: NeutralColors[700],
+    tabIconSelected: AccentColors[500],
   },
-  medium: {
-    primary: NeutralColors[700],
-    secondary: NeutralColors[500],
-    tertiary: NeutralColors[400],
+  dark: {
+    text: NeutralColors[900],
+    background: NeutralColors[300],
+    tint: AccentColors[500],
+    icon: NeutralColors[700],
+    tabIconDefault: NeutralColors[700],
+    tabIconSelected: AccentColors[500],
   },
-  background: {
-    light: BaseColors.white,
-    medium: NeutralColors[50],
-    dark: NeutralColors[100],
-  },
-} as const
+}
 
-export const Spacing = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 48,
-} as const
-
-export const IconSizes = {
-  xs: 12,
-  sm: 16,
-  md: 24,
-  lg: 32,
-  xl: 48,
-} as const
-
-export const BorderRadius = {
-  none: 0,
-  sm: 4,
-  md: 8,
-  lg: 12,
-  xl: 16,
-  xxl: 24,
-  full: 9999,
-} as const
-
-export const Shadows = {
-  none: {},
-  sm: {
-    shadowColor: BaseColors.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  md: {
-    shadowColor: BaseColors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  lg: {
-    shadowColor: BaseColors.black,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-} as const
-
+/**
+ * Font families
+ * Using Montserrat as primary sans-serif and Averia Serif Libre as serif
+ */
 export const Fonts = Platform.select({
   ios: {
-    regular: 'Inter_Regular',
-    medium: 'Inter_Medium',
-    semibold: 'Inter_SemiBold',
-    bold: 'Inter_Bold',
+    sans: 'Montserrat',
+    serif: 'AveriaSerifLibre',
+    mono: 'ui-monospace',
   },
   android: {
-    regular: 'Inter_Regular',
-    medium: 'Inter_Medium',
-    semibold: 'Inter_SemiBold',
-    bold: 'Inter_Bold',
+    sans: 'Montserrat',
+    serif: 'AveriaSerifLibre',
+    mono: 'monospace',
   },
   default: {
-    regular: 'Inter_Regular',
-    medium: 'Inter_Medium',
-    semibold: 'Inter_SemiBold',
-    bold: 'Inter_Bold',
+    sans: 'Montserrat',
+    serif: 'AveriaSerifLibre',
+    mono: 'monospace',
   },
-})!
+})

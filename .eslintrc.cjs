@@ -3,13 +3,5 @@ module.exports = {
   rules: {
     'react-native/no-raw-text': 'off',
   },
-  overrides: [
-    {
-      files: ['*.config.js', '*.config.cjs'],
-      rules: {
-        '@typescript-eslint/no-require-imports': 'off',
-      },
-    },
-  ],
 }
 

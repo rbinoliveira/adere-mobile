@@ -1,44 +1,51 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome'
-import React from 'react'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
 
-import {
-  CardSpacing,
-  IconSizes,
-  Spacing,
-} from '@/shared/constants/design-tokens'
+import { PlatformText } from '@/features/platform/components/platform-text'
+import { Icon } from '@/shared/components/icons/icon'
+import { SuccessColors } from '@/shared/constants/theme.constant'
 
 type GreetingCardProps = {
-  userName: string
+  patientName: string
 }
 
-const GREETING_ICON_SIZE = { width: 56, height: 56 } as const
+function getTodayFormatted(): string {
+  const today = new Date()
+  return today.toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
+}
 
-export function GreetingCard({ userName }: GreetingCardProps) {
-  const firstName = userName?.split(' ')[0] || 'Paciente'
+function getFirstName(fullName: string): string {
+  return fullName.split(' ')[0] ?? fullName
+}
+
+export function GreetingCard({ patientName }: GreetingCardProps) {
+  const firstName = getFirstName(patientName)
+  const today = getTodayFormatted()
 
   return (
-    <View
-      className="w-full bg-white rounded-2xl flex-row items-center border border-gray-100"
-      style={{
-        padding: CardSpacing.padding,
-        gap: Spacing.md,
-        ...CardSpacing.shadow,
-      }}
-    >
-      <View
-        className="rounded-full bg-green-500 items-center justify-center"
-        style={GREETING_ICON_SIZE}
-      >
-        <FontAwesome name="heart" size={IconSizes.large} color="white" />
+    <View className="bg-base-white rounded-2xl p-4 flex-row items-center gap-4 shadow-sm">
+      {/* Ícone de coração — verde, grande para fácil identificação */}
+      <View className="w-12 h-12 rounded-full bg-success-600/10 items-center justify-center">
+        <Icon iconName="heart" size={26} color={SuccessColors[700]} />
       </View>
+
       <View className="flex-1">
-        <Text className="text-text-one font-inter-bold text-lg">
+        <PlatformText fontSize={18} fontWeight={700} color="neutral-900">
           Olá, {firstName}!
-        </Text>
-        <Text className="text-text-three font-inter text-base mt-1">
+        </PlatformText>
+        <PlatformText fontSize={14} color="neutral-600" className="mt-0.5">
           Como você está se sentindo hoje?
-        </Text>
+        </PlatformText>
+        <PlatformText
+          fontSize={12}
+          color="neutral-500"
+          className="mt-1 capitalize"
+        >
+          {today}
+        </PlatformText>
       </View>
     </View>
   )

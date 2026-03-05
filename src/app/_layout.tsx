@@ -1,73 +1,78 @@
 import 'react-native-reanimated'
-import '@/shared/styles/globals.css'
+import '@/shared/styles/global.css'
 
+import {
+  AveriaSerifLibre_400Regular as averiaSerifLibre400Regular,
+  AveriaSerifLibre_700Bold as averiaSerifLibre700Bold,
+} from '@expo-google-fonts/averia-serif-libre'
+import {
+  Montserrat_400Regular as montserrat400Regular,
+  Montserrat_500Medium as montserrat500Medium,
+  Montserrat_600SemiBold as montserrat600SemiBold,
+  Montserrat_700Bold as montserrat700Bold,
+  useFonts,
+} from '@expo-google-fonts/montserrat'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { useFonts } from 'expo-font'
-import { Stack, useRouter, useSegments } from 'expo-router'
+import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
-import React, { useEffect } from 'react'
-import Toast from 'react-native-toast-message'
+import { useEffect } from 'react'
+import { LogBox } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
-import { AuthProvider, useAuth } from '@/features/auth/hooks/auth.hook'
-import InterBold from '@/shared/assets/fonts/Inter_Bold.ttf'
-import InterMedium from '@/shared/assets/fonts/Inter_Medium.ttf'
-import InterRegular from '@/shared/assets/fonts/Inter_Regular.ttf'
-import InterSemiBold from '@/shared/assets/fonts/Inter_SemiBold.ttf'
+import { AuthProvider } from '@/features/auth/hooks/auth.hook'
 import { queryClient } from '@/shared/config/react-query'
 
-SplashScreen.preventAutoHideAsync()
+// Suppress known warnings from dependencies
+LogBox.ignoreLogs([
+  'SafeAreaView has been deprecated and will be removed in a future release',
+  'Sending `onAnimatedValueUpdate` with no listeners registered',
+  'Ignoring DevTools app debug target',
+])
 
-function RootNavigator() {
-  const { user, loading } = useAuth()
-  const router = useRouter()
-  const segments = useSegments()
-
-  useEffect(() => {
-    if (loading) return
-
-    const inAuth = segments[0] === '(authenticated)'
-
-    if (user && !inAuth) {
-      router.replace('/(authenticated)')
-    } else if (!user && inAuth) {
-      router.replace('/login')
-    }
-  }, [router, user, loading, segments])
-
-  return (
-    <Stack>
-      <Stack.Screen name="login" options={{ headerShown: false }} />
-      <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />
-      <Stack.Screen name="+not-found" />
-      <Stack.Screen name="recover-password" options={{ headerShown: false }} />
-    </Stack>
-  )
+// Ignore all warnings (use only if specific ignores don't work)
+if (__DEV__) {
+  LogBox.ignoreAllLogs()
 }
 
+SplashScreen.preventAutoHideAsync().catch((error) => {
+  console.warn('SplashScreen.preventAutoHideAsync error:', error)
+})
+
 export default function RootLayout() {
-  const [loaded] = useFonts({
-    Inter_Regular: InterRegular,
-    Inter_Medium: InterMedium,
-    Inter_SemiBold: InterSemiBold,
-    Inter_Bold: InterBold,
+  const [fontsLoaded, fontError] = useFonts({
+    montserrat400Regular,
+    montserrat500Medium,
+    montserrat600SemiBold,
+    montserrat700Bold,
+    averiaSerifLibre400Regular,
+    averiaSerifLibre700Bold,
   })
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync()
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync().catch((error) => {
+        console.warn('SplashScreen.hideAsync error:', error)
+      })
     }
-  }, [loaded])
+  }, [fontsLoaded, fontError])
 
-  if (!loaded) {
+  if (!fontsLoaded && !fontError) {
     return null
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <RootNavigator />
-        <Toast />
-      </AuthProvider>
-    </QueryClientProvider>
+    <SafeAreaProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+          </Stack>
+        </AuthProvider>
+      </QueryClientProvider>
+    </SafeAreaProvider>
   )
 }

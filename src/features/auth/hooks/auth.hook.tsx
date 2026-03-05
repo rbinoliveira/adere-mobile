@@ -1,202 +1,117 @@
+import { onAuthStateChanged, User } from 'firebase/auth'
+import { collection, onSnapshot, query, where } from 'firebase/firestore'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+
 import {
-  createUserWithEmailAndPassword,
-  FirebaseAuthTypes,
-  getAuth,
-  GoogleAuthProvider,
-  OAuthProvider,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  signInWithCredential,
-  signInWithEmailAndPassword,
-  signOut,
-} from '@react-native-firebase/auth'
+  firebaseSendPasswordResetEmail,
+  firebaseSignInWithApple,
+  firebaseSignInWithEmail,
+  firebaseSignInWithGoogle,
+  firebaseSignOut,
+} from '@/features/auth/services/firebase-auth.service'
 import {
-  doc,
-  getDoc,
-  getFirestore,
-  serverTimestamp,
-  setDoc,
-} from '@react-native-firebase/firestore'
-import { GoogleSignin } from '@react-native-google-signin/google-signin'
-import * as AppleAuthentication from 'expo-apple-authentication'
-import * as Crypto from 'expo-crypto'
-import React, { createContext, useContext, useEffect, useState } from 'react'
-import { Platform } from 'react-native'
-
-const auth = getAuth()
-
-GoogleSignin.configure({
-  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-})
-
-type User = {
-  email: string
-  name: string
-  role: string
-  photo: string
-  phone?: string
-  birthDate?: string
-}
+  requestNotificationPermission,
+  syncPrescriptionsWithNotifications,
+} from '@/features/medications/services/notifications.service'
+import { Prescription } from '@/features/medications/types/prescription'
+import { auth, db } from '@/shared/libs/firebase'
 
 type AuthContextType = {
   user: User | null
-  login: (
-    email: string,
-    password: string,
-  ) => Promise<FirebaseAuthTypes.UserCredential>
-  register: (
-    email: string,
-    password: string,
-  ) => Promise<FirebaseAuthTypes.UserCredential>
-  logout: () => Promise<void>
   loading: boolean
-  signInWithGoogle: () => Promise<FirebaseAuthTypes.UserCredential>
-  signInWithApple: () => Promise<FirebaseAuthTypes.UserCredential>
-  recoverPassword: (email: string) => Promise<void>
-  isAppleAuthAvailable: boolean
+  signIn: (email: string, password: string) => Promise<void>
+  signInWithGoogle: () => Promise<void>
+  signInWithApple: () => Promise<void>
+  signOut: () => Promise<void>
+  sendPasswordReset: (email: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType)
-
-async function getOrCreateUser(
-  authUser: FirebaseAuthTypes.User,
-): Promise<User> {
-  const db = getFirestore()
-  const userRef = doc(db, 'users', authUser.uid)
-  const userSnap = await getDoc(userRef)
-
-  if (!userSnap.exists()) {
-    const newUser: User = {
-      email: authUser.email || '',
-      name: authUser.displayName || '',
-      role: 'user',
-      photo: authUser.photoURL || '',
-    }
-
-    await setDoc(userRef, {
-      ...newUser,
-      createdAt: serverTimestamp(),
-      uid: authUser.uid,
-    })
-
-    return newUser
-  }
-
-  const data = userSnap.data()!
-  return {
-    email: data.email,
-    name: data.name,
-    role: data.role,
-    photo: data.photo,
-    phone: data.phone,
-    birthDate: data.birthDate,
-  }
-}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const [isAppleAuthAvailable, setIsAppleAuthAvailable] = useState(false)
+  const unsubscribePrescriptionsRef = useRef<(() => void) | null>(null)
 
+  // 4.4 — On auth state change: request permission + subscribe to prescription changes for sync
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
-      let user = null
+    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+      // Clean up previous prescription listener before setting new user
+      unsubscribePrescriptionsRef.current?.()
+      unsubscribePrescriptionsRef.current = null
 
-      if (authUser) {
-        user = await getOrCreateUser(authUser)
-      }
-
-      setUser(user)
+      setUser(firebaseUser)
       setLoading(false)
+
+      if (!firebaseUser) return
+
+      // Request notification permission on login
+      await requestNotificationPermission()
+
+      // Subscribe to prescription changes and sync notifications
+      const q = query(
+        collection(db, 'prescriptions'),
+        where('patientId', '==', firebaseUser.uid),
+        where('isActive', '==', true),
+      )
+
+      unsubscribePrescriptionsRef.current = onSnapshot(q, async (snapshot) => {
+        const prescriptions: Prescription[] = snapshot.docs.map((docSnap) => ({
+          id: docSnap.id,
+          ...(docSnap.data() as Omit<Prescription, 'id'>),
+        }))
+
+        // Sync notifications whenever prescriptions change (version-aware)
+        await syncPrescriptionsWithNotifications(prescriptions).catch((err) => {
+          if (__DEV__) console.warn('[Auth] Failed to sync notifications:', err)
+        })
+      })
     })
-    return unsubscribe
-  }, [])
 
-  useEffect(() => {
-    async function checkAppleAuth() {
-      if (Platform.OS === 'ios') {
-        const isAvailable = await AppleAuthentication.isAvailableAsync()
-        setIsAppleAuthAvailable(isAvailable)
-      }
+    return () => {
+      unsubscribeAuth()
+      unsubscribePrescriptionsRef.current?.()
     }
-    checkAppleAuth()
   }, [])
 
-  function login(email: string, password: string) {
-    return signInWithEmailAndPassword(auth, email, password)
-  }
-
-  function register(email: string, password: string) {
-    return createUserWithEmailAndPassword(auth, email, password)
-  }
-
-  async function recoverPassword(email: string) {
-    await sendPasswordResetEmail(auth, email)
-  }
-
-  function logout() {
-    return signOut(auth)
+  async function signIn(email: string, password: string) {
+    await firebaseSignInWithEmail(email, password)
   }
 
   async function signInWithGoogle() {
-    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
-    const signInResult = await GoogleSignin.signIn()
-
-    const idToken = signInResult.data?.idToken
-
-    if (!idToken) {
-      throw new Error('No ID token found')
-    }
-
-    const googleCredential = GoogleAuthProvider.credential(idToken)
-
-    return signInWithCredential(getAuth(), googleCredential)
+    await firebaseSignInWithGoogle()
   }
 
   async function signInWithApple() {
-    const nonce = Math.random().toString(36).substring(2, 10)
-    const hashedNonce = await Crypto.digestStringAsync(
-      Crypto.CryptoDigestAlgorithm.SHA256,
-      nonce,
-    )
+    await firebaseSignInWithApple()
+  }
 
-    const appleCredential = await AppleAuthentication.signInAsync({
-      requestedScopes: [
-        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-        AppleAuthentication.AppleAuthenticationScope.EMAIL,
-      ],
-      nonce: hashedNonce,
-    })
+  async function signOut() {
+    await firebaseSignOut()
+  }
 
-    const { identityToken } = appleCredential
-
-    if (!identityToken) {
-      throw new Error('No identity token found')
-    }
-
-    const provider = new OAuthProvider('apple.com')
-    const credential = provider.credential({
-      idToken: identityToken,
-      rawNonce: nonce,
-    })
-
-    return signInWithCredential(auth, credential)
+  async function sendPasswordReset(email: string) {
+    await firebaseSendPasswordResetEmail(email)
   }
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        login,
-        register,
-        logout,
         loading,
+        signIn,
         signInWithGoogle,
         signInWithApple,
-        recoverPassword,
-        isAppleAuthAvailable,
+        signOut,
+        sendPasswordReset,
       }}
     >
       {children}

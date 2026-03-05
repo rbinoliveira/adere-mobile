@@ -1,93 +1,117 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { platformSelect } = require('nativewind/theme')
 
 /** @type {import('tailwindcss').Config} */
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 module.exports = {
-  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  content: ['./src/**/*.{js,jsx,ts,tsx}', './App.{js,jsx,ts,tsx}'],
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
       colors: {
-        background: '#F9FAFB',
-        border: '#D1D5DB',
-        'border-two': '#BFDBFE',
+        // Default text color
+        default: '#1C1C1C',
+        // Colors synchronized with src/shared/constants/theme.constant.ts
+        // Base colors - BaseColors
+        base: {
+          white: '#FFFFFF', // BaseColors.white
+          black: '#000000', // BaseColors.black
+        },
+        // Neutral colors - NeutralColors
         neutral: {
-          50: '#FAFAFA',
-          100: '#F5F5F5',
-          200: '#E5E5E5',
-          300: '#D4D4D4',
-          400: '#A3A3A3',
-          500: '#737373',
-          600: '#525252',
-          700: '#404040',
-          800: '#262626',
-          900: '#171717',
+          100: '#E0E0E0', // NeutralColors[100]
+          200: '#EFF2F4', // NeutralColors[200]
+          300: '#E5E9EC', // NeutralColors[300]
+          350: '#EBEBEB', // NeutralColors[350]
+          400: '#F2F4F5', // NeutralColors[400]
+          450: '#D9D9D9', // NeutralColors[450]
+          500: '#AEAEB2', // NeutralColors[500]
+          600: '#979C9E', // NeutralColors[600]
+          700: '#72777A', // NeutralColors[700]
+          800: '#494949', // NeutralColors[800]
+          850: '#3C3C43', // NeutralColors[850]
+          900: '#1C1C1C', // NeutralColors[900]
+          950: '#1C1C1C', // NeutralColors[950]
         },
+        // Accent colors - AccentColors
         accent: {
-          DEFAULT: '#3B82F6',
-          light: '#EFF6FF',
-          dark: '#1D4ED8',
+          500: '#C3161C', // AccentColors[500]
+          600: '#FF453A', // AccentColors[600]
+          950: '#FA0000', // AccentColors[950]
         },
-        primary: '#3B82F6',
-        'primary-light': '#EFF6FF',
-        'text-one': '#1F2937',
-        'text-two': '#ADAEBC',
-        'text-three': '#4B5563',
-        'text-four': '#DBEAFE',
-        'text-five': '#6B7280',
-        'text-six': '#374151',
+        // Red colors - RedColors (same as AccentColors)
+        red: {
+          500: '#C3161C', // RedColors[500]
+          600: '#FF453A', // RedColors[600]
+          950: '#FA0000', // RedColors[950]
+        },
+        // Success colors - SuccessColors
         success: {
-          DEFAULT: '#10B981',
-          bg: '#D1FAE5',
-          text: '#065F46',
+          500: '#50E51C', // SuccessColors[500]
+          600: '#35CE00', // SuccessColors[600]
+          700: '#26A324', // SuccessColors[700]
+          950: '#0EAC4F', // SuccessColors[950]
         },
+        // Green colors - GreenColors (same as SuccessColors)
+        green: {
+          500: '#50E51C', // GreenColors[500]
+          600: '#35CE00', // GreenColors[600]
+          700: '#26A324', // GreenColors[700]
+          950: '#0EAC4F', // GreenColors[950]
+        },
+        // Warning colors - WarningColors
         warning: {
-          DEFAULT: '#F59E0B',
-          bg: '#FEF3C7',
-          text: '#92400E',
+          400: '#FCD922', // WarningColors[400]
+          500: '#F8D310', // WarningColors[500]
+          950: '#F4C138', // WarningColors[950]
         },
-        danger: {
-          DEFAULT: '#EF4444',
-          bg: '#FEE2E2',
-          text: '#991B1B',
+        // Yellow colors - YellowColors (same as WarningColors)
+        yellow: {
+          400: '#FCD922', // YellowColors[400]
+          500: '#F8D310', // YellowColors[500]
+          950: '#F4C138', // YellowColors[950]
         },
-        waiting: {
-          DEFAULT: '#9CA3AF',
-          bg: '#F3F4F6',
-          text: '#374151',
+        // Info colors - InfoColors
+        info: {
+          950: '#0059DA', // InfoColors[950]
         },
-        'status-success': '#10B981',
-        'status-success-bg': '#D1FAE5',
-        'status-success-text': '#065F46',
-        'status-warning': '#F59E0B',
-        'status-warning-bg': '#FEF3C7',
-        'status-warning-text': '#92400E',
-        'status-danger': '#EF4444',
-        'status-danger-bg': '#FEE2E2',
-        'status-danger-text': '#991B1B',
-        'status-waiting': '#9CA3AF',
-        'status-waiting-bg': '#F3F4F6',
-        'status-waiting-text': '#374151',
+        // Blue colors - BlueColors (same as InfoColors)
+        blue: {
+          950: '#0059DA', // BlueColors[950]
+        },
+        // Orange colors - OrangeColors
+        orange: {
+          950: '#FF8800', // OrangeColors[950]
+        },
+        // Pink colors - PinkColors
+        pink: {
+          950: '#FF0091', // PinkColors[950]
+        },
+        // Purple colors - PurpleColors
+        purple: {
+          950: '#9933CE', // PurpleColors[950]
+        },
+        // Brown colors - BrownColors
+        brown: {
+          950: '#904500', // BrownColors[950]
+        },
       },
       fontFamily: {
-        inter: platformSelect({
-          ios: 'Inter_Regular',
-          android: 'Inter_Regular',
-          default: 'Inter, sans-serif',
+        sans: platformSelect({
+          ios: 'Montserrat',
+          android: 'Montserrat',
+          default: 'Montserrat',
         }),
-        'inter-medium': platformSelect({
-          ios: 'Inter_Medium',
-          android: 'Inter_Medium',
-          default: 'Inter, sans-serif',
+        montserrat: platformSelect({
+          ios: 'Montserrat',
+          android: 'Montserrat',
+          default: 'Montserrat',
         }),
-        'inter-semibold': platformSelect({
-          ios: 'Inter_SemiBold',
-          android: 'Inter_SemiBold',
-          default: 'Inter, sans-serif',
-        }),
-        'inter-bold': platformSelect({
-          ios: 'Inter_Bold',
-          android: 'Inter_Bold',
-          default: 'Inter, sans-serif',
+        averia: platformSelect({
+          ios: 'AveriaSerifLibre',
+          android: 'AveriaSerifLibre',
+          default: 'AveriaSerifLibre',
         }),
       },
     },

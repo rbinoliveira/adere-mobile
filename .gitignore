@@ -10,6 +10,7 @@ web-build/
 expo-env.d.ts
 
 # Native
+.kotlin/
 *.orig.*
 *.jks
 *.p8
@@ -37,19 +38,21 @@ yarn-error.*
 
 app-example
 
-android
-ios
-.expo
+# generated native folders
+/ios
+/android
 
-GoogleService-Info.plist
-google-services.json
+*.apk
 
 .env
 
+coverage/
+
+.gemini/
+
+GEMINI.md
 
 .claude/
-.gemini/
 .cursor/
 .task-flow/
 CLAUDE.md
-GEMINI.md

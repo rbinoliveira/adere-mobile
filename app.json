@@ -1,0 +1,73 @@
+{
+  "expo": {
+    "name": "adere-mobile",
+    "slug": "adere-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/shared/assets/images/icon.png",
+    "scheme": "aderemobile",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./src/shared/assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#E5E9EC"
+    },
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rbinoliveira.adere",
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.364378650714-dl6qm30acqqmmu31grpe9rlj5sf94t55"
+            ]
+          }
+        ]
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "UIViewControllerBasedStatusBarAppearance": false
+      }
+    },
+    "android": {
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.rbinoliveira.adere",
+      "versionCode": 8
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./src/shared/assets/images/icon.png",
+          "color": "#1A56DB",
+          "sounds": []
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./src/shared/assets/images/icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#E5E9EC"
+        }
+      ],
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "85d0a175-f66a-468a-991c-62b81a8adcc7"
+      }
+    },
+    "owner": "dramluisabraga"
+  }
+}
